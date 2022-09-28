@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title> <%= title %> </title>
+
+    <link rel='stylesheet' href='/stylesheets/index.css' />
+    <link rel='stylesheet' href='/stylesheets/savedLogRender.css' />
+    <link rel='stylesheet' href='/stylesheets/log.css' />
+
+
+    <script src ='/javascripts/lib/ejs.js' defer></script>
+    <script src ='/javascripts/lib/dom.js' defer></script>
+    <script src ='/javascripts/lib/log.js' defer></script>
+
+    <script src ='/javascripts/control/ctrl.log.js' defer></script>
+    <script src ='/javascripts/control/ctrl.log.content.js' defer></script>
+
+
+    <script src ='/javascripts/index.js' defer></script>
+
+    <script src ='/javascripts/content-view/savedLogRender.js' defer></script>
+    <script src ='/javascripts/content-view/logRender.js' defer></script>
+
+
+  </head>
+  <body>
+    <div class = "main-page-head">
+      <div class = "left-head-container">
+        <div class = "app-name">
+          <%= title %>
+        </div>
+      </div>  
+      <div class = "right-head-container">
+        <div>
+          Setting
+        </div>
+        <div>
+          My Page
+        </div>
+      </div>  
+    </div>
+
+    <div class = 'general'>
+      <div class = 'home-button'>
+        <span id = 'home-button'>HOME</span>
+      </div>
+      <div class = 'general-menu'>
+        <div class="hamburger" id="hamburger">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </div>
+     </div>
+    </div>
+
+    <div class = 'content-container'>
+      <div class = 'main-page-body'>
+        <div class = 'department'>
+          <% department.forEach( function (dep) { %>
+            <div class = 'dep-name'> 
+              <div>
+                <%=dep%>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+
+        <div class = 'content'>
+          <div class = 'content-'>
+            Muriel Guide
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

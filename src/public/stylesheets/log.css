@@ -1,0 +1,419 @@
+.log-master {
+
+    display : flex;
+    flex-direction : column;
+    gap : 20px;
+
+    font-family : Arial;
+    font-size : 20px;
+
+}
+
+.log-basic-master{
+
+    margin-top : 20px;
+    width : 100%;
+    display: flex;
+    flex-direction : row;
+    justify-content: space-around;
+
+}
+
+.log-start-master {
+    display:flex;
+    flex-direction : column;
+    gap : 20px;
+}
+
+/* .log-basic {
+
+   
+} */
+
+#boat > optgroup {
+
+    text-transform: capitalize;
+
+}
+
+.log-start-select-master {
+
+    display: flex;
+    flex-direction : column;
+
+    gap : 20px;
+}
+
+.log-start-select-boat {
+
+    display : flex;
+
+    justify-content: center;
+
+}
+
+.log-start-crew-master {
+
+    display: flex;
+
+    flex-direction : column;
+    gap : 20px;
+
+}
+
+.log-start-crew {
+
+    display:flex;
+    justify-content: center;
+    gap : 10px;
+
+}
+
+.log-start-crew-list-row {
+    display: flex;
+    justify-content: space-around;
+}
+
+.log-confirm-div {
+    display: flex;
+    justify-content : center;
+}
+
+.log-boat-crew-div {
+    display: flex;
+    flex-direction : row;
+    justify-content : space-around;
+}
+
+.log-boat-crew-div>:nth-child(n){
+    display:flex;
+    flex-direction : row;
+    justify-content : center;
+    gap :20px;
+
+}
+
+.log-boat-crew-div>:nth-child(n)>button{
+    height:100%;
+
+}
+
+
+.log-activity-list-row {
+    display: flex;
+    flex-direction : row;
+    justify-content : space-around;
+    margin-left : 20px;
+    gap : 10 px;
+}
+
+.log-activity-list-row>:nth-child(1) {
+    flex:1
+}
+.log-activity-list-row>:nth-child(2) {
+    flex:1
+}
+.log-activity-list-row>:nth-child(3) {
+    flex:1.5
+}
+.log-activity-list-row>:nth-child(4) {
+    flex:1.5
+}
+.log-activity-list-row>:nth-child(5) {
+    flex:2
+}
+.log-activity-list-row>:nth-child(6) {
+    flex:5
+}
+
+.wdysf {
+    display:flex;
+    justify-content: center;
+}
+
+.log-activity-list-srow {
+    display:flex;
+    justify-content : right;
+    gap: 20px;
+    margin-right : 20px;
+}
+
+.choosetype {
+
+    display:flex;
+
+    justify-content: center;
+
+}
+
+.work-sheet-master {
+    display:flex;
+    justify-content: space-around;
+    gap: 20px;
+    margin:20px;
+}
+
+.work-sheet-master>:nth-child(1){
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    flex:1
+}
+.work-sheet-master>:nth-child(2){
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    flex:1
+}
+.work-sheet-master>:nth-child(3){
+    flex:3;
+    display:flex;
+    gap :10px;
+    flex-direction :column;
+
+}
+.work-sheet-master>:nth-child(4){
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    flex-direction :column;
+}
+.work-sheet-master>:nth-child(5){
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    flex:1}
+
+.work-sheet-master-edit {
+    display:flex;
+    justify-content: space-around;
+    margin:20px;
+    gap : 20px;
+}
+
+.work-sheet-master-edit>:nth-child(1) {
+    display:flex;
+    flex-direction:column;
+    justify-content: space-around;
+    gap : 5px;
+    flex: 1;
+}
+.work-sheet-master-edit>:nth-child(1) div{
+    flex : 1;
+}
+.work-sheet-master-edit>:nth-child(1) div select{
+    width: 100%;
+}
+.work-sheet-master-edit>:nth-child(2)  {
+    display:flex;
+    justify-content: space-around;
+    gap : 5px;
+    flex-direction:column;
+    flex:1;
+
+}
+.work-sheet-master-edit>:nth-child(2) div{
+    flex :1;
+}
+.work-sheet-master-edit>:nth-child(2) input {
+    display: inline-block;
+
+}
+.work-sheet-master-edit>:nth-child(3) {
+    display:flex;
+    justify-content: center;
+    gap : 5px;
+    flex-direction:column;
+    flex:3
+
+}
+
+.work-sheet-master-edit>:nth-child(4) {
+    display:flex;
+    flex-direction : column;
+    justify-content: center;
+    gap : 20px;
+    flex:1;
+}
+.work-sheet-master-edit>:nth-child(4) div input {
+    width : 50%;
+    font-size : 14px;
+    flex:1;
+}
+
+.work-sheet-master-edit>:nth-child(5) {
+    display:flex;
+    justify-content: space-around;
+    flex-direction: column;
+    gap : 5px;
+}
+.work-sheet-master-edit>:nth-child(5) div {
+    display:flex;
+    flex:1;
+    flex-direction:column;
+}
+.work-sheet-master-edit>:nth-child(5) div input {
+    height: 100%;
+}
+
+.activity-basic-master {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.activity-edit-master {
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    gap : 20px;
+    margin-right : 20px;
+}
+
+.mort-input-master {
+    margin :20px;
+    display:flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 15px;
+    flex-wrap : wrap;
+
+}
+
+.mort-input-master>:nth-child(n){
+
+    flex: 1 0 21%;
+
+}
+
+.dive-sheet-master {
+    margin: 20px;
+    display:flex;
+    flex-direction : column;
+    gap:20px;
+}
+
+div.dive-sheet-master > div:nth-child(1){
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+    gap: 20px;
+}
+
+div.dive-sheet-master > div:nth-child(n+1){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+div.dive-sheet-master > div:nth-child(n+1) >:nth-child(3){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.crew-control-master {
+    display:flex;
+    flex-direction : column;
+    justify-content: space-around;
+    gap:20px;
+}
+
+.crew-control-master>:nth-child(n){
+    display:flex;
+    justify-content : center;
+    flex-direction: row;
+    gap : 5px;
+}
+
+.crew-control-master>:nth-child(n)>:nth-child(1){
+    flex:3;
+}
+.crew-control-master>:nth-child(n)>:nth-child(2){
+    flex:3;
+}
+.crew-control-master>:nth-child(n)>:nth-child(3){
+    flex:3;
+    display:flex;
+    justify-content: center;
+}
+.crew-control-master>:nth-child(n)>:nth-child(4){
+    flex:3;
+    display:flex;
+    justify-content: center;
+}
+.crew-control-master>:nth-child(n)>:nth-child(5){
+    flex:1;
+    display:flex;
+    justify-content: center;
+
+}
+.crew-control-master>:nth-child(n)>:last-child{
+    flex:2;
+    display: flex;
+    flex-direction:row;
+    gap:5px;
+    display:flex;
+    justify-content: center;
+
+}
+.crew-add-div {
+    display:flex;
+    justify-content: right;
+    gap : 25px;
+    font-size : 14px;
+    margin-right:30px;
+}
+
+.crew-add-div>input {
+    
+    font-size : 14px;
+}
+
+.crew-add-div>button {
+    
+    font-size : 14px;
+
+}
+
+.diver-control-master {
+
+    display:flex;
+    flex-direction:column;
+    gap : 20px;
+    justify-content: center;
+
+}
+
+.pdd-master-div {
+    display:flex;
+    flex-direction:column;
+    flex:5;
+    justify-content: center;
+    gap :  20px;
+    align-items: center;
+}
+
+.pdd-master-div>div{
+    width : 70%;
+    display:flex;
+    justify-content: space-between;
+    gap :20px;
+    text-align: center;
+
+}
+
+.diver-control-master>:nth-child(n){
+    display:flex;
+    justify-content: center;
+    flex:1;
+}
+
+.sheet-title {
+    display:flex;
+    justify-content : space-around;
+    flex-direction : row;
+}

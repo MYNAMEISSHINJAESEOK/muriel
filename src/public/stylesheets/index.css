@@ -1,0 +1,154 @@
+html {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+body {
+  display : flex;
+  flex-direction : column;
+  margin : 0;
+  height : 100%;
+  width : 85%;
+}
+
+.main-page-head {
+  font: 14px "Arial";
+  display : flex;
+  background-color: #324A5B;
+  border-style : groove;
+  border-color : white;
+  border-width : 1px;
+  border-bottom : none;
+
+  flex :1
+}
+
+.left-head-container{
+  flex : 1;
+  font-weight: bold;
+  color : white;
+  margin : 10px;
+}
+
+.app-name {
+  text-transform : uppercase;
+}
+
+.right-head-container{
+  display :flex;
+  justify-content: right;
+  flex: 1;
+  gap : 20px;
+  margin : 10px;
+  color : white;
+  font-weight : 100;
+}
+
+.general {
+  display: flex;
+  background-color: #324A5B;
+  border-style : groove;
+  border-color : white;
+  border-width : 1px;
+
+  flex :1;
+}
+
+.home-button {
+  font :  14px "Arial";
+  flex : 1;
+  font-weight: bold;
+  color : white;
+  padding : 10px;
+  text-align : center;
+
+  border-style : groove;
+  border-color : white;
+  border-width : 1px;
+  border-top: none;
+  border-bottom: none;
+  border-left : none;
+}
+
+.general-menu {
+  flex : 8;
+  display : flex;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.hamburger .line {
+  width: 35px;
+  height: 5px;
+  background: #ffffff;
+  background: linear-gradient(to right, #c2c2c2 0%, #696969 50%, #888888 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0d5384', endColorstr='#0d5384',GradientType=1 );
+  display: block;
+  margin: 5px auto;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+#hamburger {
+  margin-left : 15px;
+}
+
+.content-container {
+
+  flex : 20;
+
+}
+
+.main-page-body {
+
+  display:flex;
+
+  flex-direction:row;
+
+  height : 100%;
+
+}
+
+.department {
+  display : flex;
+  flex-direction : column;
+  background-color: #324A5B;
+  border-style : groove;
+  border-color : white;
+  border-width : 1px;
+  padding : 10px;
+
+  font : 14px "Arial";
+  flex : 1;
+  font-weight : bold;
+  color : white;
+
+  gap : 10px;
+}
+
+.dep-name {
+  display:flex;
+  text-transform : uppercase;
+  text-align : center;
+  vertical-align: middle;
+  flex : 1;
+  align-items : center;
+  align-self: center;
+  justify-content: center;
+}
+
+.content {
+  flex : 8;
+  display: flex;
+  justify-content: center;
+  vertical-align: center;
+  align-items: center;
+}
+
+.content- {
+  flex : 1;
+  text-align: center;
+}
