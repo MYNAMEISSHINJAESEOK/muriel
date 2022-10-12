@@ -12,7 +12,7 @@ const savedLogRenderLocal = (div, dep) => {
     const buttonCreate = dom.cE.b('Create');
     buttonCreate.addEventListener('click', () => {
         const title = inputCreate.value;
-        createANewLog(title, dep);
+        ctrl.savedLogListLocal.create(title, dep);
         savedLogRenderLocal(div, dep);
     });
     const frow = dom.cE.d();
@@ -58,9 +58,12 @@ const savedLogRenderLocal = (div, dep) => {
         ebtn.dataset["id"] = log.id.toString();
         updbtn.dataset["id"] = log.id.toString();
         lbtn.addEventListener('click', () => {
+            ctrl.savedLogListLocal.edit(log);
             logRender(div, log, 'list', 0);
         });
         delbtn.addEventListener('click', () => {
+            ctrl.savedLogListLocal.del(log);
+            savedLogRenderLocal(div, dep);
         });
         dom.node.adopt(savedLogListDiv, row);
         dom.node.adopt(row, index, date, logName, edit);

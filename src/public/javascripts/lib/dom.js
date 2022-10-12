@@ -87,9 +87,24 @@ const dom = {
         select: (id, ...args) => {
             const sel = document.createElement('select');
             sel.id = id;
-            args.forEach(arg => {
-                if (args.indexOf(arg) % 2 === 0) {
-                    const index = args.indexOf(arg);
+            let boolIndex;
+            let bool = false;
+            const optList = args.reduce((acc, cur, i) => {
+                if (typeof cur === 'boolean') {
+                    boolIndex = i;
+                    bool = true;
+                    return acc;
+                }
+                if (bool) { }
+                else
+                    acc.push(cur);
+                return acc;
+            }, []);
+            optList.forEach((arg, i) => {
+                if (typeof boolIndex === 'undefined')
+                    throw Error('no boolean');
+                if (optList.indexOf(arg) % 2 === 0) {
+                    const index = i;
                     const og = document.createElement('optgroup');
                     if (typeof arg === 'string') {
                         og.label = arg;
@@ -97,7 +112,8 @@ const dom = {
                     else {
                         console.error(`label is not string - ${arg}`);
                     }
-                    const list = args[index + 1];
+                    const list = optList[index + 1];
+                    const labelList = args[boolIndex + 1 + (index / 2)];
                     if (list === undefined || Array.isArray(list) !== true) {
                         console.error(`no list for optgroup - ${og.label}`);
                     }
@@ -105,10 +121,25 @@ const dom = {
                         console.error(`type of ${list} is string`);
                     }
                     else {
-                        list.forEach(o => {
+                        list.forEach((o, i) => {
                             const op = document.createElement('option');
                             op.value = o;
                             op.innerHTML = o;
+                            if (args[boolIndex] === true) {
+                                if (labelList !== undefined) {
+                                    if (Array.isArray(labelList)) {
+                                        const label = labelList[i];
+                                        if (label !== undefined) {
+                                            op.value = label;
+                                        }
+                                        else
+                                            throw Error(`${label} = label, ${labelList} = labelList, ${i} = index`);
+                                    }
+                                }
+                            }
+                            else {
+                                op.label = 'no-label-provided';
+                            }
                             og.appendChild(op);
                         });
                         sel.appendChild(og);

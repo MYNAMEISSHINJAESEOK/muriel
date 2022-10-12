@@ -294,21 +294,22 @@
     gap:20px;
 }
 
-div.dive-sheet-master > div:nth-child(1){
+div.dive-sheet-master>div:nth-child(1){
     display: flex;
     flex-direction: row;
     justify-content: right;
     gap: 20px;
+    margin-right : 50px;
 }
 
-div.dive-sheet-master > div:nth-child(n+1){
+div.dive-sheet-master>div:not(:first-of-type){
     display: flex;
     flex-direction: row;
     justify-content: space-around;
     gap: 20px;
 }
 
-div.dive-sheet-master > div:nth-child(n+1) >:nth-child(3){
+div.dive-sheet-master>div:not(first-of-type)>:nth-child(3){
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -406,7 +407,14 @@ div.dive-sheet-master > div:nth-child(n+1) >:nth-child(3){
 
 }
 
-.diver-control-master>:nth-child(n){
+
+.dive-sheet-create-div{
+    display:flex;
+    justify-content: right;
+    flex:1;
+}
+
+.diver-control-master div:not(:first-of-type){
     display:flex;
     justify-content: center;
     flex:1;

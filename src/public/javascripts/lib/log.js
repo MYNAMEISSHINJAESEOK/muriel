@@ -36,6 +36,7 @@ class Log {
                 break;
         }
     }
+    static compare = (l, m) => m.id - l.id;
 }
 class binDiver {
     act;
@@ -269,6 +270,7 @@ class DiveSheet {
     totalTime;
     anyRemarkable;
     diveSheetId;
+    timer;
     confirm;
     constructor() {
         this.diver = undefined;
@@ -301,6 +303,45 @@ class DiveSheet {
         this.anyRemarkable = null;
         this.diveSheetId = new Date().getTime();
         this.confirm = new Confirm();
+        this.timer = new Timer();
+    }
+}
+class Time {
+    hrs;
+    min;
+    sec;
+    ms;
+    constructor(hrs, min, sec, ms) {
+        this.hrs = hrs;
+        this.min = min;
+        this.sec = sec;
+        this.ms = ms;
+    }
+}
+class Timer {
+    hasStartedAlready;
+    isPaused;
+    laps;
+    constructor() {
+        this.hasStartedAlready = false;
+        this.isPaused = false;
+        this.laps = new Laps();
+    }
+}
+class Laps {
+    startTime;
+    laps;
+    constructor() {
+        this.startTime = false;
+        this.laps = [];
+    }
+}
+class Lap extends Time {
+    id;
+    constructor(hrs, min, sec, ms) {
+        super(hrs, min, sec, ms);
+        const d = new Date();
+        this.id = d.getTime();
     }
 }
 class TimeControl {
@@ -340,18 +381,6 @@ class LoggedDate {
         this.date = dateToday.getDate();
         this.month = dateToday.getMonth() + 1;
         this.year = dateToday.getFullYear();
-    }
-}
-class Time {
-    hrs;
-    min;
-    sec;
-    ms;
-    constructor(hrs, min, sec, ms) {
-        this.hrs = hrs;
-        this.min = min;
-        this.sec = sec;
-        this.ms = ms;
     }
 }
 const padStart = (targetLength, padString, str) => {

@@ -49,7 +49,7 @@ const logRender = (div, log, ...args) => {
         let selectBoat;
         switch (log.department) {
             case 'diver':
-                selectBoat = se('boat', 'south', ['Bondi Ty', 'Outcast', 'Narkosis', 'Peregrine'], 'west', ['Atlas'], 'else', ['else']);
+                selectBoat = se('boat', 'south', ['Bondi Ty', 'Outcast', 'Narkosis', 'Peregrine'], 'west', ['Atlas'], 'else', ['else'], true, ['Bondi Ty', 'Outcast', 'Narkosis', 'Peregrine'], ['Atlas'], ['else']);
                 dn.adopt(selectDiv, selectBoat);
                 break;
             default:
@@ -382,14 +382,14 @@ const logRender = (div, log, ...args) => {
             let selectLocation;
             switch (log.boat) {
                 case 'Atlas':
-                    selectLocation = se('location', 'Hub', ['Macquarie Harbour Hub', 'Mooring'], 'Middle Harbour', ['Mooring']);
+                    selectLocation = se('location', 'Hub', ['Macquarie Harbour Hub', 'Mooring'], 'Middle Harbour', ['Mooring'], true, ['Macquarie Harbour Hub', 'Mooring'], ['Mooring']);
                     dn.adopt(selectDiv, selectLocation);
                     break;
                 case 'Bondi Ty':
                 case 'Narkosis':
                 case 'Peregrine':
                 case 'Outcast':
-                    selectLocation = se('location', 'HB', ['Hideaway Bay', 'Mooring'], 'SB', ['Margate Marina']);
+                    selectLocation = se('location', 'HB', ['Hideaway Bay', 'Mooring'], 'SB', ['Margate Marina'], true, ['Hideaway Bay', 'Mooring'], ['Margate Marina']);
                     dn.adopt(selectDiv, selectLocation);
                     break;
                 default:
@@ -400,7 +400,7 @@ const logRender = (div, log, ...args) => {
             dn.padopt(whereDoYouStartFromDiv, wdysfSpan, confirmDiv, confirmBtn);
         }
         function activityRender(div, log, id) {
-            const index = ctrl.acts.getIndex(log, id);
+            const index = ctrl.acts.control.getIndex(log, id);
             const target = log.acts[index];
             activityBasicInfoRender();
             if (target === undefined) {
@@ -478,6 +478,7 @@ const logRender = (div, log, ...args) => {
                         }
                         if (workSheet.dive) {
                             diveSheetListRender(div, log, id);
+                            diveSheetRender(div);
                         }
                         console.log("helloworld4");
                         break;
@@ -529,10 +530,10 @@ const logRender = (div, log, ...args) => {
                                 const initialSDiv = di();
                                 const initialDSpan = sp(`Diver`);
                                 const diverSelectDiv = di();
-                                const diverSelect = se('diver', 'Diver', log.crews.map(crew => crew.name));
+                                const diverSelect = se('diver', 'Diver', log.crews.map(crew => crew.name), true, log.crews.map(crew => crew.id.toString()));
                                 const initialSSpan = sp(`Sup`);
                                 const supervisorSelectDiv = di();
-                                const supervisorSelect = se('diver', 'Sup', log.crews.map(crew => crew.name));
+                                const supervisorSelect = se('diver', 'Sup', log.crews.map(crew => crew.name), true, log.crews.map(crew => crew.id.toString()));
                                 const timeDiv = di();
                                 const timeStartDiv = di();
                                 const timeStartSpan = sp(`Start`);
@@ -569,11 +570,11 @@ const logRender = (div, log, ...args) => {
                                     console.log(isMortCbox.checked);
                                     switch (isMortCbox.checked) {
                                         case false:
-                                            ctrl.acts.diverworksheet.mort.uncheck(log, id);
+                                            ctrl.acts.diverWorkSheet.mort.uncheck(log, id);
                                             logRender(M, log, 'activity', id);
                                             break;
                                         case true:
-                                            ctrl.acts.diverworksheet.mort.check(log, id);
+                                            ctrl.acts.diverWorkSheet.mort.check(log, id);
                                             logRender(M, log, 'activity', id);
                                             break;
                                         default:
@@ -584,11 +585,11 @@ const logRender = (div, log, ...args) => {
                                 isDiveCbox.addEventListener('click', () => {
                                     switch (isDiveCbox.checked) {
                                         case false:
-                                            ctrl.acts.diverworksheet.dive.uncheck(log, id);
+                                            ctrl.acts.diverWorkSheet.dive.uncheck(log, id);
                                             logRender(M, log, 'activity', id);
                                             break;
                                         case true:
-                                            ctrl.acts.diverworksheet.dive.check(log, id);
+                                            ctrl.acts.diverWorkSheet.dive.check(log, id);
                                             logRender(M, log, 'activity', id);
                                             break;
                                         default:
@@ -642,7 +643,7 @@ const logRender = (div, log, ...args) => {
                 }
                 function mortSheetRender(div, log, id) {
                     console.log("helloworld");
-                    const index = ctrl.acts.getIndex(log, id);
+                    const index = ctrl.acts.control.getIndex(log, id);
                     const targetActivity = log.acts[index];
                     if (targetActivity === undefined)
                         throw new Error("target log is undefined");
@@ -696,7 +697,7 @@ const logRender = (div, log, ...args) => {
                     dn.adopt(mortSheetMasterDiv, mortSheetTitleDiv, mortInputMaster);
                 }
                 function diveSheetListRender(div, log, id) {
-                    const index = ctrl.acts.getIndex(log, id);
+                    const index = ctrl.acts.control.getIndex(log, id);
                     const targetAct = log.acts[index];
                     const diveSheetMasterDiv = di();
                     diveSheetMasterDiv.id = `divesheet-${id}`;
@@ -735,12 +736,18 @@ const logRender = (div, log, ...args) => {
                     if (diveSheetArray === false)
                         throw new Error("dive is false");
                     const fRow = di();
-                    const diveNow = bt('DIVE NOW');
+                    const seDiv = di();
+                    const btDiv = di();
+                    const seDiver = se('diver', 'Diver', log.crews.map(crew => crew.name), true, log.crews.map(crew => crew.id.toString()));
                     const createDiveSheet = bt('CREATE A NEW DIVESHEET');
-                    ctrl.acts.diverworksheet.dive.create(log, id);
-                    createDiveSheet.addEventListener('click', refreshActivity);
+                    createDiveSheet.addEventListener('click', () => {
+                        ctrl.acts.diverWorkSheet.dive.create(log, id, seDiver.value);
+                        logRender(M, log, 'activity', id);
+                    });
+                    dn.className('dive-sheet-create-div', fRow);
+                    dn.padopt(seDiv, seDiver, btDiv, createDiveSheet);
                     dn.adopt(diveSheetMasterDiv, fRow);
-                    dn.adopt(fRow, diveNow, createDiveSheet);
+                    dn.adopt(fRow, seDiv, btDiv);
                     if (diveSheetArray === true) {
                     }
                     else {
@@ -750,19 +757,19 @@ const logRender = (div, log, ...args) => {
                                 const diveSheetIndex = di();
                                 const diveSheetIndexSpan = sp((i + 1).toString());
                                 const diveSheetName = di();
-                                const diveSheetNameSpan = sp('UNCOMPLETED DIVESHEET');
+                                const diveSheetNameSpan = sp(`${dive.diver}'s UNCOMPLETED DIVESHEET`);
                                 const diveSheetBtnDiv = di();
                                 const diveSheetLoadBtn = bt('LOAD');
                                 const diveSheetDeleteBtn = bt('DELETE');
+                                const diveSheet = di();
                                 diveSheetLoadBtn.addEventListener('click', () => {
+                                    diveSheetLoader(diveSheet, dive);
                                 });
                                 diveSheetDeleteBtn.addEventListener('click', () => {
-                                    const actId = id;
-                                    const diveId = dive.diveSheetId;
-                                    ctrl.acts.diverworksheet.dive.deleteDiveSheet(log, actId, diveId);
-                                    logRender(M, log, 'activity', actId);
+                                    ctrl.acts.diverWorkSheet.dive.deleteDiveSheet(log, id, dive.diveSheetId);
+                                    logRender(M, log, 'activity', id);
                                 });
-                                dn.adopt(diveSheetMasterDiv, diveSheetRowDiv);
+                                dn.adopt(diveSheetMasterDiv, diveSheetRowDiv, diveSheet);
                                 dn.adopt(diveSheetRowDiv, diveSheetIndex, diveSheetName, diveSheetBtnDiv);
                                 dn.padopt(diveSheetIndex, diveSheetIndexSpan, diveSheetName, diveSheetNameSpan, diveSheetBtnDiv, diveSheetLoadBtn, diveSheetBtnDiv, diveSheetDeleteBtn);
                             }
@@ -774,12 +781,208 @@ const logRender = (div, log, ...args) => {
                                 const diveSheetNameSpan = sp(`${dive.diver}'s DIVE`);
                                 const diveSheetBtnDiv = di();
                                 const diveSheetLoadBtn = bt('LOAD');
-                                dn.adopt(diveSheetMasterDiv, diveSheetRowDiv);
+                                const diveSheet = di();
+                                diveSheetLoadBtn.addEventListener('click', () => {
+                                    diveSheetLoader(diveSheet, dive);
+                                });
+                                dn.adopt(diveSheetMasterDiv, diveSheetRowDiv, diveSheet);
                                 dn.adopt(diveSheetRowDiv, diveSheetIndex, diveSheetName, diveSheetBtnDiv);
                                 dn.padopt(diveSheetIndex, diveSheetIndexSpan, diveSheetName, diveSheetNameSpan, diveSheetBtnDiv, diveSheetLoadBtn);
                             }
                         });
                     }
+                    function diveSheetLoader(diveSheet, dive) {
+                        const timerDiv = di();
+                        timerRender(timerDiv, log, id, dive.diveSheetId);
+                        const diveSheetDiv = di();
+                        dn.adopt(diveSheet, timerDiv, diveSheetDiv);
+                        function timerRender(div, log, activityID, diveSheetID) {
+                            const dc = dom.cE;
+                            const dn = dom.node;
+                            const di = () => dc.d();
+                            const sp = (a) => dc.s(a);
+                            const bt = (a) => dc.b(a);
+                            const timeInterval = 33;
+                            const timeDiv = di();
+                            const span = sp('00:00:00.000');
+                            let time = 0;
+                            let timerID;
+                            const target = ctrl.acts.diverWorkSheet.dive.getDiveSheet(log, activityID, diveSheetID);
+                            const timer = target.timer;
+                            const laps = timer.laps;
+                            const startTime = laps.startTime;
+                            if (typeof startTime === 'number') {
+                                const d = new Date(startTime).getTime();
+                                const nowID = new Date().getTime();
+                                const elapsedMSec = nowID - d;
+                                const eHrs = parseInt((elapsedMSec / 1000 / 60 / 60).toString());
+                                const eMinutes = parseInt(((elapsedMSec - (eHrs * 1000 * 60 * 60)) / 1000 / 60).toString());
+                                const eSecs = parseInt(((elapsedMSec - (eHrs * 1000 * 60 * 60) - (eMinutes * 1000 * 60)) / 1000).toString());
+                                const eMSs = elapsedMSec % 1000;
+                                span.innerHTML = `${eHrs}:${eMinutes}:${eSecs}.${eMSs}`;
+                                time = elapsedMSec;
+                                startClock();
+                            }
+                            const controlDiv = di();
+                            const startClockBt = bt('START');
+                            const pauseClockBt = bt('PAUSE');
+                            const resetClockBt = bt('RESET');
+                            const lap = bt('LAP');
+                            const statusDiv = di();
+                            const statusSpan = sp('');
+                            startClockBt.onclick = () => {
+                                startClock();
+                            };
+                            pauseClockBt.onclick = () => {
+                                pauseClock();
+                            };
+                            resetClockBt.onclick = () => {
+                                resetClock();
+                            };
+                            lap.onclick = () => {
+                                lapClock();
+                                lapsRender(lapsDiv);
+                            };
+                            const lapsDiv = di();
+                            dn.adopt(div, timeDiv, controlDiv, statusDiv, lapsDiv);
+                            lapsRender(lapsDiv);
+                            function lapsRender(div) {
+                                dom.html.cl(div);
+                                const indexDiv = di();
+                                const indexSpan = sp('INDEX');
+                                const tDiv = di();
+                                const tSpan = sp('TIME');
+                                const btDiv = di();
+                                const btSpan = sp('CONTROL');
+                                const row = di();
+                                dn.adopt(row, indexDiv, tDiv, btDiv);
+                                dn.padopt(indexDiv, indexSpan, tDiv, tSpan, btDiv, btSpan);
+                                dn.adopt(div, row);
+                                laps.laps.forEach((lap, i) => {
+                                    const row = di();
+                                    const indexDiv = di();
+                                    const indexSpan = sp(`${i + 1}`);
+                                    const tDiv = di();
+                                    const tSpan = sp(`${lap.hrs}:${lap.min}:${lap.sec}.${lap.ms}`);
+                                    const btDiv = di();
+                                    const ls = bt('LEFT SURFACE');
+                                    const lb = bt('LEFT BOTTOM');
+                                    const as = bt('ARRIVED SURFACE');
+                                    const de = bt('DELETE');
+                                    de.onclick = () => {
+                                        if (target === undefined)
+                                            throw Error('dive sheet is undefined');
+                                        ctrl.acts.diverWorkSheet.dive.timer.delete(log, activityID, target.diveSheetId, lap.id);
+                                        lapsRender(div);
+                                    };
+                                    dn.adopt(btDiv, ls, lb, as, de);
+                                    dn.padopt(indexDiv, indexSpan, tDiv, tSpan);
+                                    dn.adopt(row, indexDiv, tDiv, btDiv);
+                                    dn.adopt(div, row);
+                                });
+                            }
+                            dn.padopt(timeDiv, span);
+                            dn.adopt(controlDiv, startClockBt, pauseClockBt, resetClockBt, lap);
+                            dn.adopt(statusDiv, statusSpan);
+                            function startClock() {
+                                ctrl.acts.diverWorkSheet.dive.timer.start(log, activityID, diveSheetID);
+                                if (timer.hasStartedAlready === false) {
+                                    timer.hasStartedAlready = true;
+                                }
+                                elapsedTime();
+                                printTime();
+                                clearClock();
+                                timerID = window.setInterval(startClock, timeInterval);
+                                statusSpan.innerHTML = "Stopwatch hasn't stopped watch";
+                            }
+                            function clearClock() {
+                                if (timerID !== undefined)
+                                    clearTimeout(timerID);
+                            }
+                            function pauseClock() {
+                                if (timerID !== undefined) {
+                                    clearTimeout(timerID);
+                                    timer.isPaused = true;
+                                    statusSpan.innerHTML = 'Stopwatch has paused watch';
+                                }
+                            }
+                            function lapForReset() {
+                                elapsedTime();
+                                clearClock();
+                                timerID = window.setInterval(lapForReset, timeInterval);
+                            }
+                            function restartClock() {
+                                startClock();
+                                statusSpan.innerHTML = 'Stopwatch has not stopped watch';
+                            }
+                            function resetClock() {
+                                if (timerID !== undefined) {
+                                    switch (statusSpan.innerHTML) {
+                                        case `Stopwatch hasn't stopped yet.\nReset button used for the temporary lap.`:
+                                            restartClock();
+                                            break;
+                                        case 'Stopwatch has not stopped watch':
+                                            break;
+                                        case "Stopwatch has been resetted":
+                                            statusSpan.innerHTML = `It has already been resetted`;
+                                            break;
+                                        case `It has already been resetted`:
+                                            statusSpan.innerHTML = `It had already been resetted`;
+                                            break;
+                                        case `It had already been resetted`:
+                                            alert("???");
+                                            break;
+                                        case "Stopwatch hasn't stopped watch":
+                                            lapForReset();
+                                            statusSpan.innerHTML = `Stopwatch hasn't stopped yet.\nReset button used for the temporary lap.`;
+                                            break;
+                                        case 'Stopwatch has paused watch':
+                                            clearTimeout(timerID);
+                                            time = 0;
+                                            statusSpan.innerHTML = `Stopwatch has been resetted`;
+                                            printTime();
+                                            break;
+                                        default:
+                                            console.log(statusSpan.innerHTML);
+                                            throw Error("!@#!@#");
+                                            break;
+                                    }
+                                }
+                            }
+                            const lapClock = () => {
+                                const hrs = parseInt((time / (60 * 60 * 1000)).toString());
+                                const min = parseInt(((time - hrs * 3600000) / 60000).toString());
+                                const sec = parseInt(((time - (hrs * 3600000) - (min * 60000)) / 1000).toString());
+                                const ms = time % 1000;
+                                const o = new Lap(hrs, min, sec, ms);
+                                laps.laps.push(o);
+                            };
+                            function elapsedTime() {
+                                console.log(time);
+                                time += 33;
+                            }
+                            function printTime() {
+                                span.innerHTML = getTimeFormatString();
+                            }
+                            function getTimeFormatString() {
+                                const hrs = parseInt((time / (60 * 60 * 1000)).toString());
+                                const min = parseInt(((time - hrs * 3600000) / 60000).toString());
+                                const sec = parseInt(((time - (hrs * 3600000) - (min * 60000)) / 1000).toString());
+                                const ms = time % 1000;
+                                return padStart(2, '0', hrs.toString()) + ":" + padStart(2, '0', min.toString()) + ":" + padStart(2, '0', sec.toString()) + "." + padStart(3, '0', ms.toString());
+                            }
+                        }
+                    }
+                }
+                function diveSheetRender(div) {
+                    const diveSheetMaster = di();
+                    const dive1 = di();
+                    const dive2 = di();
+                    dive1.dataset['id'] = '-Infinity';
+                    dive2.dataset['id'] = '-Infinity';
+                    dn.className('dive-sheet-master-container');
+                    dn.adopt(div, diveSheetMaster);
+                    dn.adopt(diveSheetMaster, dive1, dive2);
                 }
                 function refreshActivity() {
                     const workSheet = document.getElementById(`worksheet-${id}`);
@@ -867,7 +1070,7 @@ const logRender = (div, log, ...args) => {
                 const questionDiv = di();
                 const questionSpan = sp('Please choose the type of this activity.');
                 const selDiv = di();
-                const sel = se('type', 'type', ['Work Sheet', 'Boat Log']);
+                const sel = se('type', 'type', ['Work Sheet', 'Boat Log'], true, ['Work Sheet', 'Boat Log']);
                 const confirmDiv = di();
                 const btn = bt('CONFIRM');
                 btn.addEventListener('click', () => {
@@ -1110,7 +1313,7 @@ const logRender = (div, log, ...args) => {
                 const rfSpanDiv = di();
                 const rfSpan = sp('RF = ?');
                 const rfSelDiv = di();
-                const rfSel = se('rf', 'RF', ["?", '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0']);
+                const rfSel = se('rf', 'RF', ["?", '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0'], true, ["?", '1.0', '1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8', '1.9', '2.0']);
                 rfSel.value = "?";
                 const drugAlcoholDiv = di();
                 const drugAlcoholSpanDiv = di();
@@ -1166,7 +1369,6 @@ const logRender = (div, log, ...args) => {
                 dn.padopt(rfDiv, rfSelDiv, drugAlcoholDiv, drugAlcoholCboxDiv, decongestantDiv, decongestantCboxDiv, fitToDiveDiv, fitToDiveCboxDiv, hydratedDiv, hydratedCboxDiv, anyRemarkableDiv, anyRemarkableInputDiv, doneByDiv, doneByInputDiv);
                 dn.padopt(rfSpanDiv, rfSpan, drugAlcoholSpanDiv, drugAlcoholSpan, decongestantSpanDiv, decongestantSpan, fitToDiveSpanDiv, fitToDiveSpan, hydratedSpanDiv, hydratedSpan, anyRemarkableSpanDiv, anyRemarkableSpan, doneBySpanDiv, doneBySpan);
                 dn.padopt(rfSelDiv, rfSel, drugAlcoholCboxDiv, drugAlcoholCbox, decongestantCboxDiv, decongestantCbox, fitToDiveCboxDiv, fitToDiveCbox, hydratedCboxDiv, hydratedCbox, anyRemarkableInputDiv, anyRemarkableInput, doneByInputDiv, doneByInput);
-                // const 
             }
             else {
                 const tru = '&#10003;';

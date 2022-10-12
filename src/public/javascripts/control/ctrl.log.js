@@ -1,20 +1,4 @@
 'use strict';
-const createANewLog = (title, dep) => {
-    if (typeof title !== 'string' || typeof dep !== 'string') {
-        console.log('Title or Department Value Compromised');
-    }
-    else if (duplicateCheck(title)) {
-        alert(`There's a log that has already got the same name, ${title}`);
-    }
-    else {
-        const log = new Log(title, dep);
-        saveLog(log);
-    }
-    function duplicateCheck(name) {
-        const arrayKey = Object.keys(localStorage);
-        return arrayKey.includes(name);
-    }
-};
 const saveLog = (log) => {
     if (typeof log === 'object') {
         if (log instanceof Log !== true) {

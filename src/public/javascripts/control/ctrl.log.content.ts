@@ -1,11 +1,30 @@
 const ctrl = {
-    savedLogList : {
-        edit : (log:Log, id : number) => {
-            log.isBeingEdited = true;
+    savedLogListLocal : {
+        create : (title : string, dep: string) => {
+
+            if (typeof title !== 'string' || typeof dep !== 'string') {
+                console.log('Title or Department Value Compromised')
+            } else if (duplicateCheck(title)) {
+                    alert(`There's a log that has already got the same name, ${title}`);
+            } else {
+                const log = new Log(title, dep);
+                saveLog(log);
+            }
+        
+            function duplicateCheck (name : string) {
+                const arrayKey : Array<string> = Object.keys(localStorage);
+                return arrayKey.includes(name)
+            }
+        
         }
         ,
-        del : (log:Log, id : number) => {
-            
+        edit : (log:Log) => {
+            log.isBeingEdited = true;
+            saveLog(log);
+        }
+        ,
+        del : (log:Log) => {
+            localStorage.removeItem(log.name);
         }
     }
     ,
@@ -35,6 +54,36 @@ const ctrl = {
     ,
 
     crews: {
+        validCheck : {
+            crews : (log : Log, id: number) => {
+                const index =  ctrl.crews.getCrewIndex(log, id);
+                const crew = log.crews[index];
+                if (crew === undefined) throw new Error("no crew for this id");
+                return crew
+            }
+            ,
+            diveCrews : (log : Log, id: number) => {
+                const index =  ctrl.crews.getCrewIndex(log, id);
+                const crew = log.crews[index];
+                if (crew === undefined) throw new Error("no crew for this id");
+                if (!('dive' in crew)) throw new Error("this is not a dive crew");
+                return crew
+            }
+
+        }
+        ,
+        
+
+        getCrewIndex : (log : Log, id : number) => {
+            const crews = log.crews;
+            const filteredList = crews.map( crew => crew.id );
+            const crewIndex = filteredList.indexOf(id);
+            if (crewIndex === -1) throw new Error("crewIndex === -1")
+            return crewIndex
+        }
+
+        ,
+
         addCrew : (log : Log, name : string) => {
             if (log.department !== 'diver') {
             const newCrew = new Crew(name);
@@ -46,6 +95,7 @@ const ctrl = {
                 log.crews.push(newCrew);
             }
             saveLog(log);
+
         }
         ,
         delCrew : (log: Log, id : number) => {
@@ -54,17 +104,14 @@ const ctrl = {
         }
         ,
         getTimeOn: (log:Log, id:number) => {
-            const idArray = log.crews.map ( crew => crew.id);
-            const index =  idArray.indexOf(id);
-            const crew = log.crews[index];
-
-            if(crew === undefined) throw new Error("crew is undefined, getTimeOn");
+            const crew = ctrl.crews.validCheck.crews(log, id)
 
             if(crew.timeOnBoard === null) {
 
                 return 'TBD'
 
             } else {
+
                 const hrs = crew.timeOnBoard.hrs;
                 const min = crew.timeOnBoard.min;
                 const sec = crew.timeOnBoard.sec;
@@ -75,11 +122,7 @@ const ctrl = {
         }
         ,
         getTimeOff: (log:Log, id:number) : string => {
-            const idArray = log.crews.map ( crew => crew.id);
-            const index =  idArray.indexOf(id);
-            const crew = log.crews[index];
-
-            if(crew === undefined) throw new Error("crew is undefined, getTimeOn");
+            const crew = ctrl.crews.validCheck.crews(log, id)
 
             if(crew.timeOffBoard === null) {
                 return 'TBD'
@@ -94,24 +137,14 @@ const ctrl = {
         }
         ,
         edit : (log:Log, id:number) => {
-            const idArray = log.crews.map ( crew => crew.id);
-            const index =  idArray.indexOf(id);
-            const crew = log.crews[index];
-
-            if(crew === undefined) throw new Error("crew is undefined, getTimeOn");
-
+            const crew = ctrl.crews.validCheck.crews(log, id)
             crew.isBeingEdited = true;
             saveLog(log);
 
         }
         ,
         update : (log:Log, id:number, obj:any) => {
-            const idArray = log.crews.map ( crew => crew.id);
-            const index =  idArray.indexOf(id);
-            const crew = log.crews[index];
-
-            if(crew === undefined) throw new Error("crew is undefined, getTimeOff");
-
+            const crew = ctrl.crews.validCheck.crews(log, id)
             crew.isBeingEdited = false;
             saveLog(log);
 
@@ -120,12 +153,8 @@ const ctrl = {
         ,
         bin : (log:Log, id:number) => {
 
-            
-            const idArray = log.crews.map ( crew => crew.id);
-            const index =  idArray.indexOf(id);
-            const crew = log.crews[index];
-
-            if(crew === undefined) throw new Error("crew is undefined, bin");
+            const index = ctrl.crews.getCrewIndex(log, id);
+            const crew = ctrl.crews.validCheck.crews(log, id)
 
             log.bin.crews.push(crew);
 
@@ -136,13 +165,9 @@ const ctrl = {
         ,
         dive : {
             pdd : {
-                start : (log: Log, crewID: number) => {
+                start : (log: Log, id: number) => {
 
-                    const idArray = log.crews.map ( crew => crew.id);
-                    const index =  idArray.indexOf(crewID);
-                    const crew = <DiveCrew> log.crews[index];
-
-                    if(crew === undefined) throw new Error("crew is undefined, pdd start");
+                    const crew = ctrl.crews.validCheck.diveCrews(log, id)
                     if(crew.dive.preDive !== false) throw new Error("preDive is not false with pdd not having started");
 
                     crew.dive.preDive = true;
@@ -151,13 +176,9 @@ const ctrl = {
 
                 ,
 
-                confirm : (log:Log, crewID:number, pdd:PDD) => {
+                confirm : (log:Log, id:number, pdd:PDD) => {
 
-                    const idArray = log.crews.map ( crew => crew.id);
-                    const index =  idArray.indexOf(crewID);
-                    const crew = <DiveCrew> log.crews[index];
-
-                    if(crew === undefined) throw new Error("crew is undefined, pdd start");
+                    const crew = ctrl.crews.validCheck.diveCrews(log, id)
 
                     crew.dive.preDive = pdd;
                     saveLog(log);
@@ -172,13 +193,25 @@ const ctrl = {
 
         control : {
 
-            validIndexCheck : (log : Log, id : number) => {
-                const index = ctrl.acts.getIndex(log, id);
-                    const targetAct = log.acts[index];
+            validActivityCheck : (log : Log, id : number) => {
+                const index = ctrl.acts.control.getIndex(log, id);
+                const targetAct = log.acts[index];
 
-                    if (targetAct === undefined) {
-                        throw new Error("cannot find the activity that is corresponding to the id");
-                    }
+                if (targetAct === undefined) {
+                    throw new Error("cannot find the activity that is corresponding to the id");
+                }
+
+                return targetAct
+            }
+
+            ,
+
+            getIndex : (log : Log, id : number) : number => {
+            
+                ctrl.acts.deduplicate(log);
+                const index : number = log.acts.map( act => act.id).indexOf(id);
+                return index
+
             }
 
         }
@@ -191,7 +224,7 @@ const ctrl = {
                 const newAct = new Activity();
                 newAct.location = 'TBD';
                
-                const index = ctrl.acts.getIndex( log, id);
+                const index = ctrl.acts.control.getIndex( log, id);
                 
                 if (index-1 < 0){
                     alert('Cannot create a new activity before the first log');
@@ -206,7 +239,7 @@ const ctrl = {
             after : (log : Log, id : number) => {
 
                 const newAct = new Activity();
-                const index = ctrl.acts.getIndex( log, id);
+                const index = ctrl.acts.control.getIndex( log, id);
                 
                 log.acts.splice(index+1, 0, newAct);
                 saveLog(log);
@@ -218,9 +251,8 @@ const ctrl = {
 
         edit : {
             editTime : (log : Log, id:number) => {
-                const index = ctrl.acts.getIndex(log, id);
-
-                const target = log.acts[index];
+                const index = ctrl.acts.control.getIndex( log, id);
+                const target = ctrl.acts.control.validActivityCheck(log,id);
 
                 if (target !== undefined) {
                     target.control.isTimeBeingEdited = true;
@@ -234,24 +266,21 @@ const ctrl = {
 
             updateTime : (log : Log, id : number, startTime : string, endTime : string) => {
 
-                const index = ctrl.acts.getIndex(log, id);
-                const target = log.acts[index];
+                const target = ctrl.acts.control.validActivityCheck(log,id);
+               
+                target.control.isTimeBeingEdited = false;
 
-                if (target !== undefined) {
+                const bool1 = general.timeValidCheck(startTime);
+                const bool2 = general.timeValidCheck(endTime);
 
-                    target.control.isTimeBeingEdited = false;
+                if (bool1 && bool2) {
 
-                    const bool1 = general.timeValidCheck(startTime);
-                    const bool2 = general.timeValidCheck(endTime);
+                    const timeStartObject = general.getTimeObject(startTime);
+                    target.start.time = timeStartObject;
 
-                    if (bool1 && bool2) {
-
-                        const timeStartObject = general.getTimeObject(startTime);
-                        target.start.time = timeStartObject;
-
-                        const timeEndObject = general.getTimeObject(endTime);
-                        target.end.time = timeEndObject;
-                        saveLog(log);
+                    const timeEndObject = general.getTimeObject(endTime);
+                    target.end.time = timeEndObject;
+                    saveLog(log);
 
 
                 } else {
@@ -260,25 +289,17 @@ const ctrl = {
 
                 }
 
-                } else {
-                    throw new Error()
-                }
+                
 
             }
             ,
 
             edit : ( log : Log, id : number) => {
 
-                const index = ctrl.acts.getIndex(log,id);
+                const target = ctrl.acts.control.validActivityCheck(log,id);
+                target.control.isBeingEdited = true;
+                saveLog(log);
 
-                const target = log.acts[index];
-
-                if( target !== undefined) {
-
-                    target.control.isBeingEdited = true;
-                    saveLog(log);
-
-                }
 
             }
 
@@ -286,45 +307,33 @@ const ctrl = {
 
             update : ( log : Log, id : number, object :any) => {
 
-                const index = ctrl.acts.getIndex(log,id);
-
-                const target = log.acts[index];
-
-                if( target !== undefined) {
-
-                    target.control.isBeingEdited = false;
-                    saveLog(log);
-
-                }
+                const target = ctrl.acts.control.validActivityCheck(log,id);
+                target.control.isBeingEdited = false;
+                saveLog(log);
+             
             }
         }
 
         ,
 
-        diverworksheet : {
+        diverWorkSheet : {
 
+            validCheck : (log: Log, id : number) => {
+                const target = ctrl.acts.control.validActivityCheck(log,id);
+                const targetWorkSheet = target.activityDetail
+
+                if (targetWorkSheet === undefined) throw new Error("worksheet is undefined");
+                if (targetWorkSheet instanceof BoatLog) throw new Error("this act is boatlog");
+
+                return targetWorkSheet
+            }
+            ,
             mort : {
 
                 check : (log : Log, id : number) => {
 
-                    const index = ctrl.acts.getIndex(log, id);
-                    const targetAct = log.acts[index];
-
-                    if (targetAct === undefined) {
-
-                        throw new Error("cannot find the activity that is corresponding to the id");
-
-                    }
-
-                    const workSheet = targetAct.activityDetail
-
-                    if ( workSheet instanceof BoatLog || workSheet === undefined){
-
-                        throw new Error("this target Activity is not the Act that has got the correct type for this method")
-                    }
-
+                    const workSheet = ctrl.acts.diverWorkSheet.validCheck(log, id);
                     workSheet.mort = new MortSheet();
-
                     saveLog(log);
 
                 }
@@ -333,23 +342,8 @@ const ctrl = {
 
                 uncheck : ( log: Log, id : number) => {
 
-                    const index = ctrl.acts.getIndex(log, id);
-                    const targetAct = log.acts[index];
-
-                    if (targetAct === undefined) {
-                        throw new Error("cannot find the activity that is corresponding to the id");
-                    }
-
-                    const workSheet = targetAct.activityDetail
-
-                    if ( workSheet instanceof BoatLog || workSheet === undefined){
-
-                        throw new Error("this target Activity is not the Act that has got the correct type for this method")
-                    }
-
+                    const workSheet = ctrl.acts.diverWorkSheet.validCheck(log, id);
                     workSheet.mort = false;
-;   
-
                     saveLog(log);
 
                 }
@@ -359,27 +353,47 @@ const ctrl = {
             ,
 
             dive : {
+                validCheck : {
+                    array : (log:Log, actId:number) : DiveSheet[] => {
+
+                        const targetWorkSheet = ctrl.acts.diverWorkSheet.validCheck(log, actId);
+                        const targetDiveSheets = targetWorkSheet.dive
+    
+                        if (typeof targetDiveSheets === 'boolean') throw new Error("there's no divesheet for this act");
+                        if (Array.isArray(targetDiveSheets)) return targetDiveSheets
+                        
+                        throw new Error(`${targetDiveSheets}`)
+    
+                    }
+                    ,
+                    diveSheet : (log:Log, actId:number) : DiveSheet => {
+                
+
+                        return new DiveSheet()
+                    
+                    }
+                }
+                ,
+                
+                
+                getDiveSheet : (log:Log, id:number, diveSheetID:number) : DiveSheet => {
+
+                    const diveArray = ctrl.acts.diverWorkSheet.dive.validCheck.array(log, id);
+
+                    const idArray = diveArray.map( sheet => sheet.diveSheetId)
+                    const indexDiveSheet = idArray.indexOf(diveSheetID);
+                    const diveSheet = diveArray[indexDiveSheet];
+
+                    if (indexDiveSheet === -1 || diveSheet === undefined) throw Error("No divesheet for this ID")
+
+                    return diveSheet
+                }
+                ,
 
                 check  : ( log: Log, id : number ) => {
 
-                    const index = ctrl.acts.getIndex(log, id);
-                    const targetAct = log.acts[index];
-
-                    if (targetAct === undefined) {
-
-                        throw new Error("cannot find the activity that is corresponding to the id");
-
-                    }
-
-                    const workSheet = targetAct.activityDetail
-
-                    if ( workSheet instanceof BoatLog || workSheet === undefined){
-
-                        throw new Error("this target Activity is not the Act that has got the correct type for this method")
-                    }
-
+                    const workSheet = ctrl.acts.diverWorkSheet.validCheck(log, id);
                     workSheet.dive = true;
-
                     saveLog(log)
 
                 }
@@ -388,94 +402,115 @@ const ctrl = {
 
                 uncheck : ( log: Log, id : number) => {
 
-                    const index = ctrl.acts.getIndex(log, id);
-
-                    const targetAct = log.acts[index];
-
-                    if (targetAct === undefined) {
-
-                        throw new Error("cannot find the activity that is corresponding to the id")
-
-                    }
-
-                    const workSheet = targetAct.activityDetail
-
-                    if ( workSheet instanceof BoatLog || workSheet === undefined){
-
-                        throw new Error("this target Activity is not the Act that has got the correct type for this method")
-
-                    }
-
+                    const workSheet = ctrl.acts.diverWorkSheet.validCheck(log, id);
                     workSheet.dive = false;
-
                     saveLog(log)
                 }
 
                 ,
 
-                create : (log: Log, id: number) => {
+                create : (log: Log, id: number, diver:string) => {
 
-                    const index = ctrl.acts.getIndex(log, id);
+                    const diverID = parseInt(diver);
+                    const workSheet = ctrl.acts.diverWorkSheet.validCheck(log, id);
+                    const arrayDiveSheet = workSheet.dive;
 
-                    const targetAct = log.acts[index];
-
-                    if (targetAct === undefined) {
-
-                        throw new Error("cannot find the activity that is corresponding to the id")
-
-                    }
-
-                    const workSheet = targetAct.activityDetail
-
-                    if ( workSheet instanceof BoatLog || workSheet === undefined){
-
-                        throw new Error("this target Activity is not the Act that has got the correct type for this method")
-
-                    }
-
-                    if (workSheet.dive === false) {
-                       
-                        throw new Error("dive is false ctrl.acts.dive.create");
-                    } else if (workSheet.dive === true) {
+                    if (arrayDiveSheet === true) {
 
                         workSheet.dive = new Array();
-                        const newDiveSheet = new DiveSheet();
-                        workSheet.dive.push(newDiveSheet);
-                        saveLog(log)
 
+                    } 
+                    
+                    if (Array.isArray(arrayDiveSheet)) {
 
-                    } else {
                         const newDiveSheet = new DiveSheet();
-                        workSheet.dive.push(newDiveSheet);
+                        newDiveSheet.diverId = diverID;
+                        const diver = ctrl.crews.validCheck.diveCrews(log, diverID);
+                        newDiveSheet.diver = diver.name
+                        arrayDiveSheet.push(newDiveSheet);
                         saveLog(log)
 
                     }
 
+                    else {
+                    
+                        throw new Error(`dive is something wrong ${typeof workSheet.dive} = typeof dive`)
+                    
+                    }
+                    
 
                 }
 
                 ,
 
                 deleteDiveSheet(log :Log, actId:number, diveId:number) {
-                    const index = ctrl.acts.getIndex(log, actId);
+                    
+                    const targetWorkSheet = ctrl.acts.diverWorkSheet.validCheck(log, actId);
+                    const targetDiveSheetArray = ctrl.acts.diverWorkSheet.dive.validCheck.array(log, actId);
 
-                    const targetAct = log.acts[index];
+                    targetWorkSheet.dive= targetDiveSheetArray.filter( divesheet => divesheet.diveSheetId !== diveId);
 
-                    if (targetAct === undefined) throw new Error("targetAct is undefined");
+                }
 
-                    const targetWorkSheet = targetAct.activityDetail
+                ,
 
-                    if (targetWorkSheet === undefined) throw new Error("worksheet is undefined");
+                timer: {
 
-                    if (targetWorkSheet instanceof BoatLog) throw new Error("this act is boatlog");
+                    delete : (log : Log, actId : number, diveId : number, timeID: number) => {
 
-                    const targetDiveSheet = targetWorkSheet.dive
+                        const ds = ctrl.acts.diverWorkSheet.dive.getDiveSheet(log, actId, diveId);
 
-                    if (typeof targetDiveSheet === 'boolean') throw new Error("there's no divesheet for this act");
+                        const arr = ds.timer.laps.laps.filter( lap => {
+                            return lap.id !== timeID
+                        });
 
-                    const arrayDiveSheets = targetDiveSheet;
+                        ds.timer.laps.laps = arr;
 
-                    targetWorkSheet.dive= arrayDiveSheets.filter( divesheet => divesheet.diveSheetId !== diveId);
+                        saveLog(log);
+
+                    }
+
+                    , 
+
+                    getLapIndex : (log : Log, actId : number, diveId : number, timeID: number) => {
+                        const ds = ctrl.acts.diverWorkSheet.dive.getDiveSheet(log, actId, diveId);
+
+                        const idArray = ds.timer.laps.laps.map( lap => {
+                            return lap.id
+                        });
+
+                        return idArray.indexOf(timeID);
+                        
+                    }
+
+                    ,
+
+                    start : (log : Log, actId : number, diveId : number) => {
+
+                        const diveSheet = ctrl.acts.diverWorkSheet.dive.getDiveSheet(log, actId, diveId);
+
+                    }
+
+                    ,
+
+                    pause : () => {
+
+                    }
+
+                    ,
+
+                    reset : () => {
+
+                    }
+
+                    ,
+
+                    lap : () => {
+
+
+                    }
+
+                
 
                 }
 
@@ -528,33 +563,29 @@ const ctrl = {
         ,
 
         chooseType : (log:Log, id : number, type : string) : void => {
-            const index = ctrl.acts.getIndex(log, id);
 
-            const target = log.acts[index];
+            const target = ctrl.acts.control.validActivityCheck(log,id);
 
-            if (target === undefined) {
-                throw new Error('target act is undefined - ctrl.acts.chooseType')
-            } else {
-                switch(type) {
-                    case 'Work Sheet' :
-                        target.isWork = true;
-                        switch (log.department) {
-                            case 'diver' :
-                                target.activityDetail = new DiverWorkSheet();
-                                break
-                            default :
-                                throw new Error(`LOG DEPARTMENT : ${log.department}`);
-                        }
-                        break
+            switch(type) {
+                case 'Work Sheet' :
+                    target.isWork = true;
+                    switch (log.department) {
+                        case 'diver' :
+                            target.activityDetail = new DiverWorkSheet();
+                            break
+                        default :
+                            throw new Error(`LOG DEPARTMENT : ${log.department}`);
+                    }
+                    break
 
-                    case 'Boat Log' :
-                        target.isBoatLog = true;
-                        target.activityDetail = new BoatLog();
-                        break
+                case 'Boat Log' :
+                    target.isBoatLog = true;
+                    target.activityDetail = new BoatLog();
+                    break
 
-                    default :
-                        break
-                }
+                default :
+                    break
+            
             }
 
             saveLog(log);
@@ -563,55 +594,39 @@ const ctrl = {
         ,
 
         start : (log :Log, id: number) : void => {
-            const index = ctrl.acts.getIndex(log, id);
                       
-            const target = log.acts[index];
-            if (target===undefined) {
-                console.error('target act is undefined - ctrl.acts.start');
-            } else {
+            const target = ctrl.acts.control.validActivityCheck(log,id);
             const t = new Date();
             target.start = new Start();
             target.start.time = new Time(t.getHours(), t.getMinutes(), t.getSeconds(), t.getMilliseconds());
-            }
+            
             saveLog(log);
-
             
         }
 
         ,
 
         isBoatLog : (log : Log, id : number) :void => {
-            const index = ctrl.acts.getIndex(log, id);
 
-            const target = log.acts[index];
-
-            if (target === undefined) {
-                console.error('target act is undefined - ctrl.acts.isBoatLog');
-            } else {
-                target.activityDetail = new BoatLog();
-            }
+            const target = ctrl.acts.control.validActivityCheck(log,id);
+            target.activityDetail = new BoatLog();
+            
             saveLog(log);
 
         },
 
         boatLogComment : (log : Log, id : number, comment :string) : void => {
 
-            const index = ctrl.acts.getIndex(log,id);
-
-            const target = log.acts[index];
-
-            if (target === undefined) {
-                console.error('target act is undefined - ctrl.acts.boatLogComment');
-            } else {
-                const targetBoatLog = target.activityDetail;
-                if (targetBoatLog === undefined) {
-                    console.error('target activityDetail is undefined')
-                }   else if(targetBoatLog instanceof DiverWorkSheet) {
-                    console.error('target activityDetail is worksheet')
-                }   else {
-                    targetBoatLog.comment = comment;
-                }
+            const target = ctrl.acts.control.validActivityCheck(log,id);
+            const targetBoatLog = target.activityDetail;
+            if (targetBoatLog === undefined) {
+                console.error('target activityDetail is undefined')
+            }   else if(targetBoatLog instanceof DiverWorkSheet) {
+                console.error('target activityDetail is worksheet')
+            }   else {
+                targetBoatLog.comment = comment;
             }
+            
             saveLog(log);
 
         }
@@ -640,21 +655,10 @@ const ctrl = {
         }
 
         ,
-        
-        getIndex : (log : Log, id : number) : number => {
-        
-            ctrl.acts.deduplicate(log);
-            const index : number = log.acts.map( act => act.id).indexOf(id);
-            return index
-
-        }
-
-        ,
 
         getStartTime : (log: Log, id : number) : string => {
 
-            const index = ctrl.acts.getIndex(log, id);
-            const time = log.acts[index]?.start.time;
+            const time = ctrl.acts.control.validActivityCheck(log, id).start.time;
 
             if (time === undefined) {
 
@@ -670,8 +674,7 @@ const ctrl = {
 
         getEndTime : (log: Log, id : number) : string => {
 
-            const index = ctrl.acts.getIndex(log, id);
-            const time = log.acts[index]?.end.time;
+            const time = ctrl.acts.control.validActivityCheck(log, id).end.time;
 
             if (time === undefined) {
 
@@ -724,5 +727,6 @@ const general = {
         const d = new Date();
 
         return new Time(d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds());
+
     }
 }

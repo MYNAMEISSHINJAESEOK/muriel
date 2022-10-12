@@ -15,10 +15,11 @@ const savedLogRenderLocal = (div:HTMLDivElement, dep:string) => {
     const spanCreate = dom.cE.s('Please Create A New Log')
     const inputCreate = dom.cE.i('text', 'Log Name');
     const buttonCreate = dom.cE.b('Create');
+
     buttonCreate.addEventListener( 'click' , () => {
 
         const title = inputCreate.value;
-        createANewLog(title, dep);
+        ctrl.savedLogListLocal.create(title, dep);
         savedLogRenderLocal(div, dep);
 
     });
@@ -80,11 +81,13 @@ const savedLogRenderLocal = (div:HTMLDivElement, dep:string) => {
         updbtn.dataset["id"] = log.id.toString();
 
         lbtn.addEventListener('click', () => {
-          logRender(div, log, 'list', 0);
+            ctrl.savedLogListLocal.edit(log)
+            logRender(div, log, 'list', 0);
         }
         );
         delbtn.addEventListener('click', () => {
-            
+            ctrl.savedLogListLocal.del(log);
+            savedLogRenderLocal(div, dep);
         })
 
         dom.node.adopt(savedLogListDiv, row);

@@ -41,6 +41,8 @@ class Log {
         }
         
     }
+
+    static compare = (l:Log, m:Log) => m.id-l.id
 }
 
 class binDiver {
@@ -374,6 +376,9 @@ class DiveSheet {
     public anyRemarkable : string | null;
 
     public diveSheetId : number;
+
+    public timer : Timer;
+
     public confirm : Confirm;
     
     constructor () {
@@ -408,7 +413,68 @@ class DiveSheet {
         this.anyRemarkable = null;
         this.diveSheetId = new Date().getTime();
         this.confirm = new Confirm();
+        this.timer = new Timer();
         
+    }
+
+}
+
+class Time {
+    
+    public hrs : number;
+    public min : number;
+    public sec : number;
+    public ms : number;
+
+    constructor (hrs : number , min : number, sec :number, ms :number) {
+
+        this.hrs = hrs ; 
+        this.min = min ;
+        this.sec = sec ;
+        this.ms = ms
+        
+    }
+    
+}
+
+class Timer {
+    
+    public hasStartedAlready : boolean;
+    public isPaused : boolean;
+    public laps : Laps;
+
+    constructor () {
+
+        this.hasStartedAlready = false;
+        this.isPaused = false;
+        this.laps = new Laps();
+
+    }
+
+}
+
+class Laps {
+
+    public startTime : boolean | number;
+    public laps : Array<Lap>;
+
+    constructor() {
+
+        this.startTime = false;
+        this.laps = [];
+        
+    }
+    
+}
+
+class Lap extends Time {
+
+    public id : number;
+
+    constructor (hrs : number, min : number, sec : number, ms : number) {
+        super(hrs, min, sec, ms);
+        const d = new Date();
+        this.id = d.getTime();
     }
 
 }
@@ -481,23 +547,7 @@ class LoggedDate {
     }
 }
 
-class Time {
-    
-    public hrs : number;
-    public min : number;
-    public sec : number;
-    public ms : number;
 
-    constructor (hrs : number , min : number, sec :number, ms :number) {
-
-        this.hrs = hrs ; 
-        this.min = min ;
-        this.sec = sec ;
-        this.ms = ms
-        
-    }
-    
-}
 
 const padStart = (targetLength: number, padString: string, str: string): string => {
 

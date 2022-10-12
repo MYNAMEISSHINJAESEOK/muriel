@@ -1,23 +1,5 @@
 'use strict'
 
-const createANewLog = (title : string, dep: string) => {
-
-    if (typeof title !== 'string' || typeof dep !== 'string') {
-        console.log('Title or Department Value Compromised')
-    } else if (duplicateCheck(title)) {
-            alert(`There's a log that has already got the same name, ${title}`);
-    } else {
-        const log = new Log(title, dep);
-        saveLog(log);
-    }
-
-    function duplicateCheck (name : string) {
-        const arrayKey : Array<string> = Object.keys(localStorage);
-        return arrayKey.includes(name)
-    }
-
-}
-
 const saveLog = (log : Log) => {
 
     if (typeof log === 'object'){
@@ -93,7 +75,7 @@ const assignObjectToClass = ( o : Log ) : Log => {
 
     const c = new Log(o.name, o.department);
     Object.assign(c, o);
-
+    
     return c
     }
     
